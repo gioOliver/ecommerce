@@ -5,4 +5,16 @@
 
 <h3>Store</h3>
 
+{% for item in items %}
+
+
+<p>
+   <img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
+    Item: {{item.name}} <br />
+    Preço: {{item.value}} <br />
+</p>
+
+{% endfor %}
+
+
 {% endblock %}
