@@ -3,7 +3,9 @@ from .models import *
 
 # Create your views here.
 def homepage(request):
-    return render(request, 'homepage.html')
+    banners = Banner.objects.all()
+    context = {"banners": banners}
+    return render(request, 'homepage.html', context)
 
 def store(request):
     items = Item.objects.all()

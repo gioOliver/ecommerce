@@ -63,3 +63,10 @@ class ItemOrder(models.Model):
     amount      = models.IntegerField(default=0)
     order       = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
 
+class Banner(models.Model):
+    imagem          = models.ImageField(null=True, blank=True)
+    link_destino    = models.CharField(max_length=400, null=True, blank=True)
+    ativo           = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.link_destino} - ativo: {self.ativo}"
