@@ -64,9 +64,9 @@ class ItemOrder(models.Model):
     order       = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
 
 class Banner(models.Model):
-    imagem          = models.ImageField(null=True, blank=True)
-    link_destino    = models.CharField(max_length=400, null=True, blank=True)
-    ativo           = models.BooleanField(default=False)
+    image   = models.ImageField(null=True, blank=True)
+    url     = models.CharField(max_length=400, null=True, blank=True)
+    active  = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.link_destino} - ativo: {self.ativo}"
+        return f"{self.url} - active: {self.active}"

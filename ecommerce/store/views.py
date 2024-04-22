@@ -3,12 +3,16 @@ from .models import *
 
 # Create your views here.
 def homepage(request):
-    banners = Banner.objects.all()
+    banners = Banner.objects.filter(active = True)
     context = {"banners": banners}
     return render(request, 'homepage.html', context)
 
-def store(request):
-    items = Item.objects.all()
+def store(request, category_name = None):
+    items = Item.objects.filter(active = True)
+
+    if category_name:
+        items = items.filter(category__name=category_name)
+
     context = {"items": items}
     return render(request, 'store.html', context)
 
