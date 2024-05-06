@@ -9,7 +9,9 @@
 
 
 <p>
-   <img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
+    <a href="{% url 'get_item' item.id %}">
+        <img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
+    </a>
     Item: {{item.name}} <br />
     Preço: {{item.value}} <br />
 </p>

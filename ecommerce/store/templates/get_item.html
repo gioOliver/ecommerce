@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+
+<h3>-{{ item.name }}</h3>
+
+
+{% if has_stock %}
+
+<img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
+<p>Item: {{item.name}} </p>
+<p>Value: {{item.value}} </p>
+
+{% if selected_color %}
+    Cor: {{selected_color.name}}
+{% endif %}
+
+{% for color in colors %}
+<a href="{% url 'get_item' item.id color.id %}">
+    <i class="fa-solid fa-circle" style="color: {{color.code}}"></i>
+</a>
+
+{% endfor %}
+
+{% if sizes %}
+<form method="post" action="{% url 'add_cart' item.id %}">
+    {% csrf_token %}
+    <p>Chose the size</p>
+
+    {% for size in sizes %}
+
+    <input type="radio" name="size" value="{{ size }}">
+    <label for="{{size}}" >{{ size }}</label>
+
+    {% endfor %}
+    <input type="hidden" name="color" value="{{selected_color.id}}">
+    <button type="submit" >Add to cart</button>
+</form>
+{% endif %}
+
+
+
+{% else %}
+
+<p>Item out of stock</p>
+
+
+{% endif %}
+{% endblock %}

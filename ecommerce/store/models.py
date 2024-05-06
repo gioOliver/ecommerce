@@ -35,11 +35,22 @@ class Item(models.Model):
     def __str__(self):
         return f"Name: {self.name}, Category: {self.category}, Type: {self.type}, Price: {self.value}"
 
+class Color(models.Model):
+    name        = models.CharField(max_length=200, null=True, blank=True)
+    code        = models.CharField(max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class ItemStock(models.Model):
     item    = models.ForeignKey(Item, null=True, blank=True, on_delete=models.SET_NULL)
-    color   = models.CharField(max_length=400, null=True, blank=True)
+    color   = models.ForeignKey(Color, null=True, blank=True, on_delete=models.SET_NULL)
     size    = models.CharField(max_length=400, null=True, blank=True)
     amount  = models.IntegerField(default=0)
+
+    def __str__(self) -> str:
+        return f"{self.item.name}, Tamanho: {self.size}, Cor: {self.color.name}"
 
 class Address(models.Model):
     street      = models.CharField(max_length=400, null=True, blank=True)
