@@ -10,7 +10,7 @@ class Client(models.Model):
     user        = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
     
     def __str__(self):
-        return str(self.name)
+        return str(self.email)
 
 class Category(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True)
@@ -68,11 +68,18 @@ class Order(models.Model):
     address             = models.ForeignKey(Address, null=True, blank=True, on_delete=models.SET_NULL)
     finished_date       = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self) -> str:
+        return f"Client: {self.client.email} - Id {self.id} - Finished: {self.finished}"
+
 
 class ItemOrder(models.Model):
     item_stock  = models.ForeignKey(ItemStock, null=True, blank=True, on_delete=models.SET_NULL)
     amount      = models.IntegerField(default=0)
     order       = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def __str__(self) -> str:
+        return f"Order Id - {self.order.id} - Item: {self.item_stock.item}, {self.item_stock.size}, {self.item_stock.color.name}"
+
 
 class Banner(models.Model):
     image   = models.ImageField(null=True, blank=True)
