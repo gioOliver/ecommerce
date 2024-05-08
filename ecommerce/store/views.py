@@ -68,9 +68,25 @@ def add_cart(request, item_id):
         print(data)
         if not size:
             redirect('store')
+
+        if request.user.is_authenticated:
+            client = request.user.client
+        else:
+            return redirect('store')
+            
+        order, created = Order.objects.get_or_create(client=client, finished=False)
+        item_stock = ItemStock.objects.get(item__id=item_id, size=size, color__id=color_id)
+
+        item_order, created = ItemOrder.objects.get_or_create(item_stock=item_stock, order=order)
+        item_order.amount += 1
+        item_order.save()
+
         return redirect('cart')
     else:
         return redirect('store')
+
+def remove_cart(request):
+    return redirect('cart')
 
 def checkout(request):
     return render(request, 'checkout.html')
