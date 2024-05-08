@@ -71,15 +71,30 @@ class Order(models.Model):
     def __str__(self) -> str:
         return f"Client: {self.client.email} - Id {self.id} - Finished: {self.finished}"
 
+    @property
+    def total_amount(self):
+        items = ItemOrder.objects.filter(order__id=self.id)
+        amount = sum( [item.amount for item in items] )
+        return amount
+
+    @property
+    def total_value(self):
+        items = ItemOrder.objects.filter(order__id=self.id)
+        value = sum( [item.total_value for item in items] )
+        return value
 
 class ItemOrder(models.Model):
     item_stock  = models.ForeignKey(ItemStock, null=True, blank=True, on_delete=models.SET_NULL)
     amount      = models.IntegerField(default=0)
     order       = models.ForeignKey(Order, null=True, blank=True, on_delete=models.SET_NULL)
 
+
     def __str__(self) -> str:
         return f"Order Id - {self.order.id} - Item: {self.item_stock.item}, {self.item_stock.size}, {self.item_stock.color.name}"
 
+    @property
+    def total_value(self):
+        return self.amount * self.item_stock.item.value
 
 class Banner(models.Model):
     image   = models.ImageField(null=True, blank=True)

@@ -7,7 +7,7 @@ def cart(request):
     if request.user.is_authenticated:
         client = request.user.client
     else:
-        print('não logado')
+        return {"cart_items_count":cart_items_count}
 
     order, created = Order.objects.get_or_create(client=client, finished=False)
    

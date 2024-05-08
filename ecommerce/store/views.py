@@ -46,7 +46,19 @@ def get_item(request, item_id, color_id=None):
     return render(request, 'get_item.html', context)
 
 def cart(request):
-    return render(request, 'cart.html')
+
+    if request.user.is_authenticated:
+        client = request.user.client
+
+    order, created = Order.objects.get_or_create(client=client, finished=False)
+   
+    order_items = ItemOrder.objects.filter(order=order)
+
+    context = {
+        "order_items": order_items,
+        "order": order
+    }
+    return render(request, 'cart.html', context)
 
 def add_cart(request, item_id):
     if request.method == "POST" and item_id:
