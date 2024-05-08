@@ -85,8 +85,33 @@ def add_cart(request, item_id):
     else:
         return redirect('store')
 
-def remove_cart(request):
-    return redirect('cart')
+def remove_cart(request, item_id):
+    if request.method == "POST" and item_id:
+        data = request.POST.dict()
+        size = data.get("size")
+        color_id = data.get("color")
+        print(data)
+        if not size:
+            redirect('store')
+
+        if request.user.is_authenticated:
+            client = request.user.client
+        else:
+            return redirect('store')
+            
+        order = Order.objects.get(client=client, finished=False)
+        item_stock = ItemStock.objects.get(item__id=item_id, size=size, color__id=color_id)
+
+        item_order = ItemOrder.objects.get(item_stock=item_stock, order=order)
+        item_order.amount -= 1
+        item_order.save()
+
+        if item_order.amount <= 0:
+            item_order.delete()
+
+        return redirect('cart')
+    else:
+        return redirect('store')
 
 def checkout(request):
     return render(request, 'checkout.html')
