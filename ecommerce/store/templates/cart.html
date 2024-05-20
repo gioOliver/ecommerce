@@ -5,37 +5,43 @@
 
     <h3>Cart</h3>
 
-    <h4>Order Number: {{order.id}}</h4>
-    <p>Total: {{order.total_value}}</p>
-    <p>Amount: {{order.total_amount}}</p>
+    {% if has_client %}
+        <h4>Order Number: {{order.id}}</h4>
+        <p>Total: {{order.total_value}}</p>
+        <p>Amount: {{order.total_amount}}</p>
 
-    {% for item in order_items %}
-        <img src="{{item.item_stock.item.image.url}}" alt="{{item.item_stock.item.name}}" width="50" height="70"  >
-        <p>
-            Item: {{item.item_stock.item.name}}; <br>
-            Color: {{item.item_stock.color.name}} <br>
-            Size: {{item.item_stock.size}} <br>
-            <div style="display: flex;">
-                Amount:
-                <form method="post" action="{% url 'remove_cart' item.item_stock.item.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="color" value="{{item.item_stock.color.id}}">
-                    <input type="hidden" name="size" value="{{item.item_stock.size}}">
-                    <button>-</button> 
-                </form>
-                {{item.amount}}
-                <form method="post" action="{% url 'add_cart' item.item_stock.item.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="color" value="{{item.item_stock.color.id}}">
-                    <input type="hidden" name="size" value="{{item.item_stock.size}}">
-                    <button type="submit">+</button>
-                </form>
-            </div>
-            Unity Value: ${{item.item_stock.item.value}} <br>
-            Sub Total Value: ${{item.total_value}}
-        </p>
-        <hr>
-    {% endfor %}
+        {% for item in order_items %}
+            <img src="{{item.item_stock.item.image.url}}" alt="{{item.item_stock.item.name}}" width="50" height="70"  >
+            <p>
+                Item: {{item.item_stock.item.name}}; <br>
+                Color: {{item.item_stock.color.name}} <br>
+                Size: {{item.item_stock.size}} <br>
+                <div style="display: flex;">
+                    Amount:
+                    <form method="post" action="{% url 'remove_cart' item.item_stock.item.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="color" value="{{item.item_stock.color.id}}">
+                        <input type="hidden" name="size" value="{{item.item_stock.size}}">
+                        <button>-</button> 
+                    </form>
+                    {{item.amount}}
+                    <form method="post" action="{% url 'add_cart' item.item_stock.item.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="color" value="{{item.item_stock.color.id}}">
+                        <input type="hidden" name="size" value="{{item.item_stock.size}}">
+                        <button type="submit">+</button>
+                    </form>
+                </div>
+                Unity Value: ${{item.item_stock.item.value}} <br>
+                Sub Total Value: ${{item.total_value}}
+            </p>
+            <hr>
+        {% endfor %}
 
-    <a href="{% url 'checkout' %}">Checkout</a>
+        <a href="{% url 'checkout' %}">Checkout</a>
+    {% else %}
+        <h3>Seu carrinho está vazio</h3>
+        <a href="{% url 'store' %}"> Visite nossa loja </a>
+    {% endif %}
+
 {% endblock %}

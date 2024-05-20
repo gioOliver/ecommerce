@@ -1,4 +1,4 @@
-from .models import Order, ItemOrder
+from .models import Order, ItemOrder, Client
 
 def cart(request):
 
@@ -7,7 +7,11 @@ def cart(request):
     if request.user.is_authenticated:
         client = request.user.client
     else:
-        return {"cart_items_count":cart_items_count}
+        if request.COOKIES.get("session_id"):
+            session_id = request.COOKIES.get("session_id")
+            client, created = Client.objects.get_or_create(session_id=session_id)
+        else:
+            return {"cart_items_count":cart_items_count}
 
     order, created = Order.objects.get_or_create(client=client, finished=False)
    

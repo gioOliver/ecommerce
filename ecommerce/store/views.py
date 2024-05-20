@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import *
+import uuid
 
 # Create your views here.
 def homepage(request):
@@ -49,6 +50,18 @@ def cart(request):
 
     if request.user.is_authenticated:
         client = request.user.client
+    else:
+        if request.COOKIES.get("session_id"):
+            session_id = request.COOKIES.get("session_id")
+            client, created = Client.objects.get_or_create(session_id=session_id)
+        else:
+            context = {
+                "has_client": False,
+                "order_items": None,
+                "order": None
+            }
+            return render(request, 'cart.html', context)
+            
 
     order, created = Order.objects.get_or_create(client=client, finished=False)
    
@@ -56,7 +69,8 @@ def cart(request):
 
     context = {
         "order_items": order_items,
-        "order": order
+        "order": order,
+        "has_client": True
     }
     return render(request, 'cart.html', context)
 
@@ -65,14 +79,22 @@ def add_cart(request, item_id):
         data = request.POST.dict()
         size = data.get("size")
         color_id = data.get("color")
-        print(data)
+
         if not size:
             redirect('store')
+
+        response = redirect('cart')
 
         if request.user.is_authenticated:
             client = request.user.client
         else:
-            return redirect('store')
+            if request.COOKIES.get("session_id"):
+                session_id = request.COOKIES.get("session_id")
+            else:
+                session_id = str(uuid.uuid4())
+                response.set_cookie(key="session_id", value=session_id, max_age=60*60*24*30)
+            
+            client, created = Client.objects.get_or_create(session_id=session_id)
             
         order, created = Order.objects.get_or_create(client=client, finished=False)
         item_stock = ItemStock.objects.get(item__id=item_id, size=size, color__id=color_id)
@@ -81,7 +103,7 @@ def add_cart(request, item_id):
         item_order.amount += 1
         item_order.save()
 
-        return redirect('cart')
+        return response
     else:
         return redirect('store')
 
@@ -96,8 +118,12 @@ def remove_cart(request, item_id):
 
         if request.user.is_authenticated:
             client = request.user.client
-        else:
-            return redirect('store')
+        else: 
+            if request.COOKIES.get("session_id"):
+                session_id = request.COOKIES.get("session_id")
+                client, created = Client.objects.get_or_create(session_id=session_id)
+            else:
+                return redirect('store')
             
         order = Order.objects.get(client=client, finished=False)
         item_stock = ItemStock.objects.get(item__id=item_id, size=size, color__id=color_id)
