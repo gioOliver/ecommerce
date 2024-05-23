@@ -4,5 +4,19 @@
 {% block body %}
 
     <h3>Adicionar Endereço</h3>
-   
+    <a href="{% url 'checkout' %}">Retornar à compra</a>
+
+    <h3>Adicione um novo endere</h3>
+    <form method="post" action="{% url 'add_address' %}">
+        {% csrf_token %} 
+        
+        <input type="text" name="city" placeholder="Cidade"><br>
+        <input type="text" name="state" placeholder="Estado"><br>
+        <input type="text" name="street" placeholder="Rua"><br>
+        <input type="number" name="number" placeholder="Número"><br>
+        <input type="text" name="line_two" placeholder="Complemento"><br>
+        <input type="number" name="zip_code" placeholder="CEP"><br>
+
+        <button type="submit"> Adicionar Endereço </button>
+    </form>
 {% endblock %}

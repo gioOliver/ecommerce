@@ -159,8 +159,31 @@ def checkout(request):
     return render(request, 'checkout.html', context)
 
 def add_address(request):
-    context = {}
-    return render(request, 'add_address.html', context)
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            client = request.user.client
+        else:
+            if request.COOKIES.get("session_id"):
+                session_id = request.COOKIES.get("session_id")
+                client, created = Client.objects.get_or_create(session_id=session_id)
+            else:
+                return redirect('store')
+        
+        data = request.POST.dict()
+        address = Address.objects.create(
+            client = client,
+            street = data.get("street"),
+            number = int(data.get("number")),
+            line_two = data.get("line_two"),
+            zip_code = str(data.get("zip_code")),
+            city = data.get("city"),
+            state = data.get("state")
+        )
+        address.save()
+        return redirect("checkout")
+    else:
+        context = {}
+        return render(request, 'add_address.html', context)
 
 def my_account(request):
     return render(request, 'user/my_account.html')
