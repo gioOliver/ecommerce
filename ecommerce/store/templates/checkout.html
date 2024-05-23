@@ -3,6 +3,37 @@
 
 {% block body %}
 
-<h3>Checkout</h3>
+    <h3>Checkout</h3>
+    <a href="{% url 'cart' %}">Voltar ao Carrinho</a>
 
+    <h4>Order Number: {{order.id}}</h4>
+    <p>Total: {{order.total_value}}</p>
+    <p>Amount: {{order.total_amount}}</p>
+
+    <form method="post" action="">
+        {% csrf_token %}
+        <h3>Selecione o endereço de entrega</h3>
+        <a href="{% url 'add_address' %}">Adicionar endereço de entrega </a>
+        <br>
+        {% for address in addresses %}
+            <input type="radio" name="address" value="{{ address.id }}">
+            <label for="{{address.id}}" >
+                {{ address.city }}-{{address.state}}
+                , {{address.street}}
+                , {{address.number}}
+                , {{address.line_two}}
+                , {{address.zip_code}}
+            </label>
+            <br>
+        {% endfor %}
+
+        {% if not request.user.is_authenticated %}
+        <hr>
+            <h4>Informe seu email para finalizar o pedido</h4>
+            <input type="email" name="email" placeholder="email">
+        {% endif %}
+        <hr>
+        <input type="hidden" name="total" value="{{ order.total_value }}">
+        <button type="submit"> Finalizar Pedido - R${{ order.total_value }} </button>
+    </form>
 {% endblock %}

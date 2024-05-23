@@ -61,6 +61,9 @@ class Address(models.Model):
     state       = models.CharField(max_length=200, null=True, blank=True)
     client      = models.ForeignKey(Client, null=True, blank=True, on_delete=models.SET_NULL)
 
+    def __str__(self) -> str:
+        return f"{self.client} - {self.street} - {self.city} - {self.zip_code}"
+
 class Order(models.Model):
     client              = models.ForeignKey(Client, null=True, blank=True, on_delete=models.SET_NULL)
     finished            = models.BooleanField(default=True)

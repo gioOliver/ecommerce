@@ -140,7 +140,27 @@ def remove_cart(request, item_id):
         return redirect('store')
 
 def checkout(request):
-    return render(request, 'checkout.html')
+    if request.user.is_authenticated:
+        client = request.user.client
+    else:
+        if request.COOKIES.get("session_id"):
+            session_id = request.COOKIES.get("session_id")
+            client, created = Client.objects.get_or_create(session_id=session_id)
+        else:
+           return redirect('store')
+    
+    order, created = Order.objects.get_or_create(client=client, finished=False)
+    addresses = Address.objects.filter(client = client)
+
+    context = {
+        "order": order,
+        "addresses": addresses
+    }
+    return render(request, 'checkout.html', context)
+
+def add_address(request):
+    context = {}
+    return render(request, 'add_address.html', context)
 
 def my_account(request):
     return render(request, 'user/my_account.html')
