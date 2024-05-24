@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 import uuid
+from .helpers import filter_items
 
 # Create your views here.
 def homepage(request):
@@ -8,12 +9,9 @@ def homepage(request):
     context = {"banners": banners}
     return render(request, 'homepage.html', context)
 
-def store(request, category_name = None):
+def store(request, filter = None):
     items = Item.objects.filter(active = True)
-
-    if category_name:
-        items = items.filter(category__name=category_name)
-
+    items = filter_items(items, filter)
     context = {"items": items}
     return render(request, 'store.html', context)
 

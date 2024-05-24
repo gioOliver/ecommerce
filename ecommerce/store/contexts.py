@@ -1,4 +1,4 @@
-from .models import Order, ItemOrder, Client
+from .models import Order, ItemOrder, Client, Category, Type
 
 def cart(request):
 
@@ -22,4 +22,12 @@ def cart(request):
 
     return {
         "cart_items_count":cart_items_count
+    }
+
+def categories_types(request):
+    categories = Category.objects.all()
+    types = Type.objects.all()
+    return {
+        "categories": categories,
+        "types": types
     }
