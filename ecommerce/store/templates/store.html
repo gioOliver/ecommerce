@@ -3,20 +3,43 @@
 
 {% block body %}
 
-<h3>Store</h3>
+    <h3>Store</h3>
 
-{% for item in items %}
+    <form method="POST" action="">
+        <p>Preço</p>
+        <input type="number" name="min_value" value={{min_value}}>
+        <input type="number" name="max_value" value={{max_value}}>
+        <hr>
+        <p>Tamanho</p>
+        {% for size in sizes %}
+            <input type="radio" name="size" value="{{ size }}">
+            <label for="{{size}}" >{{ size }}</label>
+        {% endfor %}
+        <hr>
+        <p>Categoria</p>
+        {% for category in categories %}
+            <div>
+                <input type="radio" name="category" value="{{ category.slug }}">
+                <label for="{{category.slug}}" >{{ category.name }}</label>
+            </div>    
+        {% endfor %}
+        <hr>
+        <p>Tipo</p>
+        {% for type in types %}
+            <input type="radio" name="type" value="{{ type.slug }}">
+            <label for="{{type.slug}}" >{{ type.name }}</label>
+        {% endfor %}
+        <hr>
+        <button type="submit">Aplicar Filtros</button>
+    </form>
 
-
-<p>
-    <a href="{% url 'get_item' item.id %}">
-        <img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
-    </a>
-    Item: {{item.name}} <br />
-    Preço: {{item.value}} <br />
-</p>
-
-{% endfor %}
-
-
+    {% for item in items %}
+        <p>
+            <a href="{% url 'get_item' item.id %}">
+                <img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
+            </a>
+            Item: {{item.name}} <br />
+            Preço: {{item.value}} <br />
+        </p>
+    {% endfor %}
 {% endblock %}

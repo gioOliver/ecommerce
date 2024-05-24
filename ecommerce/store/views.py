@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 import uuid
-from .helpers import filter_items
+from .helpers import filter_items, min_max_value
 
 # Create your views here.
 def homepage(request):
@@ -12,7 +12,14 @@ def homepage(request):
 def store(request, filter = None):
     items = Item.objects.filter(active = True)
     items = filter_items(items, filter)
-    context = {"items": items}
+    sizes = ["P", "M", "G"]
+    min_value, max_value = min_max_value(items)
+    context = {
+        "items": items,
+        "min_value": min_value,
+        "max_value": max_value,
+        "sizes": sizes
+    }
     return render(request, 'store.html', context)
 
 def get_item(request, item_id, color_id=None):

@@ -1,3 +1,5 @@
+from django.db.models import Max, Min
+
 def filter_items(items, filter):
     if filter:
         if "-" in filter:
@@ -7,3 +9,14 @@ def filter_items(items, filter):
             items = items.filter(category__slug=filter)
 
     return items
+
+def min_max_value(items):
+    min_value = 0
+    max_value = 0
+    if len(items) > 0:
+        min_value = list(items.aggregate(Min("value")).values())[0]
+        min_value = round(min_value, 2)
+        max_value = list(items.aggregate(Max("value")).values())[0]
+        max_value = round(max_value, 2)
+
+    return min_value, max_value
