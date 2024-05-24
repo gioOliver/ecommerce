@@ -12,7 +12,8 @@ def homepage(request):
 def store(request, filter = None):
     items = Item.objects.filter(active = True)
     items = filter_items(items, filter)
-    sizes = ["P", "M", "G"]
+    items_stock = ItemStock.objects.filter(amount__gt=0, item__in=items)
+    sizes = items_stock.values_list("size", flat=True).distinct()
     min_value, max_value = min_max_value(items)
     context = {
         "items": items,
