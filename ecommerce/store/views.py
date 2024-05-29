@@ -12,6 +12,15 @@ def homepage(request):
 def store(request, filter = None):
     items = Item.objects.filter(active = True)
     items = filter_items(items, filter)
+    if request.method == "POST":
+        data = request.POST.dict()
+        items = items.filter(value__gte=data.get("min_value"), value__lte=data.get("max_value"))
+        
+        if "size" in data:
+            items_stock = ItemStock.objects.filter(item__in=items, size=data.get("size"))
+            items_id = items_stock.values_list("item", flat=True).distinct()
+            items = items.filter(id__in=items_id)
+
     items_stock = ItemStock.objects.filter(amount__gt=0, item__in=items)
     sizes = items_stock.values_list("size", flat=True).distinct()
     min_value, max_value = min_max_value(items)

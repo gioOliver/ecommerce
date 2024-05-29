@@ -6,6 +6,7 @@
     <h3>Store</h3>
 
     <form method="POST" action="">
+        {% csrf_token %}
         <p>Preço</p>
         <input type="number" name="min_value" value={{min_value}}>
         <input type="number" name="max_value" value={{max_value}}>
