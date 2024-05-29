@@ -28,6 +28,6 @@ def categories_types(request):
     categories = Category.objects.all()
     types = Type.objects.all()
     return {
-        "categories": categories,
-        "types": types
+        "navigation_categories": categories,
+        "navigation_types": types
     }
