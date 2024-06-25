@@ -36,6 +36,11 @@ class Item(models.Model):
     
     def __str__(self):
         return f"Name: {self.name}, Category: {self.category}, Type: {self.type}, Price: {self.value}"
+    
+    def total_sales(self):
+        items = ItemOrder.objects.filter(order__finished = True, item_stock__item = self.id)
+        total = sum([item.amount for item in items])
+        return total
 
 class Color(models.Model):
     name        = models.CharField(max_length=200, null=True, blank=True)

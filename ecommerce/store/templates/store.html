@@ -4,43 +4,52 @@
 {% block body %}
 
     <h3>Store</h3>
-
-    <form method="POST" action="">
-        {% csrf_token %}
-        <p>Preço</p>
-        <input type="number" name="min_value" value={{min_value}}>
-        <input type="number" name="max_value" value={{max_value}}>
-        <hr>
-        <p>Tamanho</p>
-        {% for size in sizes %}
-            <input type="radio" name="size" value="{{ size }}">
-            <label for="{{size}}" >{{ size }}</label>
-        {% endfor %}
-        <hr>
-        <p>Categoria</p>
-        {% for category in categories %}
-            <div>
-                <input type="radio" name="category" value="{{ category.slug }}">
-                <label for="{{category.slug}}" >{{ category.name }}</label>
-            </div>    
-        {% endfor %}
-        <hr>
-        <p>Tipo</p>
-        {% for type in navigation_types %}
-            <input type="radio" name="type" value="{{ type.slug }}">
-            <label for="{{type.slug}}" >{{ type.name }}</label>
-        {% endfor %}
-        <hr>
-        <button type="submit">Aplicar Filtros</button>
-    </form>
-
-    {% for item in items %}
-        <p>
-            <a href="{% url 'get_item' item.id %}">
-                <img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
-            </a>
-            Item: {{item.name}} <br />
-            Preço: {{item.value}} <br />
-        </p>
-    {% endfor %}
+    <div style="display: flex;">
+        <form method="POST" action="">
+            {% csrf_token %}
+            <p>Preço</p>
+            <input type="number" name="min_value" value={{min_value}}>
+            <input type="number" name="max_value" value={{max_value}}>
+            <hr>
+            <p>Tamanho</p>
+            {% for size in sizes %}
+                <input type="radio" name="size" value="{{ size }}">
+                <label for="{{size}}" >{{ size }}</label>
+            {% endfor %}
+            <hr>
+            <p>Categoria</p>
+            {% for category in categories %}
+                <div>
+                    <input type="radio" name="category" value="{{ category.slug }}">
+                    <label for="{{category.slug}}" >{{ category.name }}</label>
+                </div>    
+            {% endfor %}
+            <hr>
+            <p>Tipo</p>
+            {% for type in navigation_types %}
+                <input type="radio" name="type" value="{{ type.slug }}">
+                <label for="{{type.slug}}" >{{ type.name }}</label>
+            {% endfor %}
+            <hr>
+            <button type="submit">Aplicar Filtros</button>
+        </form>
+        <div>
+            Ordenar por:
+            <ul>
+                <li><a href="#" class="order-item" name="min-value">Menor Preço</a></li>
+                <li><a href="#" class="order-item" name="max-value">Maior Preço</a></li>
+                <li><a href="#" class="order-item" name="best-seller">Mais Vendido</a></li>
+            </ul>
+            {% for item in items %}
+            <p>
+                <a href="{% url 'get_item' item.id %}">
+                    <img src="{{item.image.url}}" alt="{{item.name}}" width="300" height="450"> <br />
+                </a>
+                Item: {{item.name}} <br />
+                Preço: {{item.value}} <br />
+            </p>
+            {% endfor %}
+        </div>
+    </div>
+   
 {% endblock %}

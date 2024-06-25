@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .models import *
 import uuid
-from .helpers import filter_items, min_max_value
+from .helpers import filter_items, min_max_value, order_items
 
 # Create your views here.
 def homepage(request):
@@ -32,6 +32,9 @@ def store(request, filter = None):
     categories_id = items.values_list("category", flat=True).distinct()
     categories = Category.objects.filter(id__in=categories_id)
     min_value, max_value = min_max_value(items)
+
+    order = request.GET.get("order", "min-value")
+    items = order_items(items, order)
     context = {
         "items": items,
         "min_value": min_value,

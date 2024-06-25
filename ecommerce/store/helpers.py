@@ -20,3 +20,17 @@ def min_max_value(items):
         max_value = round(max_value, 2)
 
     return min_value, max_value
+
+def order_items(items, order):
+    
+    if order == "min-value":
+        items = items.order_by("value")
+    elif order == "max-value":
+        items = items.order_by("-value")
+    elif order == "best-seller":
+        items_list = []
+        for item in items:
+            items_list.append((item.total_sales(), item))
+        items_list = sorted(items_list, key=lambda x: x[0], reverse=True)
+        items = [item[1] for item in items_list]
+    return items
