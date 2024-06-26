@@ -3,6 +3,8 @@ from .models import *
 import uuid
 from .helpers import filter_items, min_max_value, order_items
 from django.contrib.auth import login, logout, authenticate
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 # Create your views here.
 def homepage(request):
@@ -217,6 +219,52 @@ def my_account(request):
     return render(request, 'user/my_account.html')
 
 def create_account(request):
+    if request.user.is_authenticated:
+        return redirect('store')
+    
+    if request.method == 'POST':
+        data = request.POST.dict()
+        error = None
+
+        if "email" in data and "password" in data and 'password-confirmation' in data:
+            password = data.get("password")
+            email = data.get("email")
+            confirmation = data.get("password-confirmation")
+
+            try:
+                validate_email(email)
+            except ValidationError:
+                error = "invalid_email"
+
+            if password == confirmation:
+                user, created = User.objects.get_or_create(username=email, email=email)
+                if not created:
+                    error = 'user_exists'
+                else:
+                    user.set_password(password)
+                    user.save()
+                    
+                    user = authenticate(request, username=email, password=password)
+                    login(request, user)
+
+                    if request.COOKIES.get("session_id"):
+                        session_id = request.COOKIES.get("session_id")
+                        client, created = Client.objects.get_or_create(session_id=session_id)
+                    else:
+                        client, created = Client.objects.get_or_create(email=email)
+
+                    client.user = user
+                    client.email = email
+                    client.save()
+                    return redirect('store')
+
+            else:
+                error="confirmation"
+
+        else:
+            error = "empty_fields"
+
+
     return render(request, 'user/create_account.html')
 
 def login_user(request):
