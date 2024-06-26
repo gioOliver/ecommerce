@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .models import *
 import uuid
 from .helpers import filter_items, min_max_value, order_items
+from django.contrib.auth import login, logout, authenticate
 
 # Create your views here.
 def homepage(request):
@@ -215,5 +216,30 @@ def add_address(request):
 def my_account(request):
     return render(request, 'user/my_account.html')
 
-def login(request):
-    return render(request, 'user/login.html')
+def create_account(request):
+    return render(request, 'user/create_account.html')
+
+def login_user(request):
+    error = False
+
+    if request.user.is_authenticated:
+        return redirect('store')
+
+    if request.method == 'POST':
+        data = request.POST.dict()
+        
+        if "email" in data and "password" in data:
+            email = data.get("email")
+            password = data.get("password")
+            user = authenticate(request, username=email, password=password)
+
+            if user:
+                login(request, user)
+                return redirect('store')
+            else:
+                error = True
+        else:
+            error=True
+
+    context = {"error":error}
+    return render(request, 'user/login.html', context)

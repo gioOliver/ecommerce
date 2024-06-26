@@ -5,4 +5,20 @@
 
 <h3>Login</h3>
 
+{% if error %}
+
+    <h4>Credenciais inválidas</h4>
+
+{% endif %}
+
+<form method="post" action="{% url 'login_user' %}">
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Email"> <br>
+    <input type="password" name="password" placeholder="Senha" ><br>
+    <button type="submit">Login</button>
+</form>
+
+<a href="{% url 'create_account' %}">Não tem uma conta? Criar conta</a> <br>
+<a href="#">Esqueci minha senha</a>
+
 {% endblock %}
