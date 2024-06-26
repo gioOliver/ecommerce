@@ -221,11 +221,10 @@ def my_account(request):
 def create_account(request):
     if request.user.is_authenticated:
         return redirect('store')
-    
+    error = None
     if request.method == 'POST':
         data = request.POST.dict()
-        error = None
-
+        
         if "email" in data and "password" in data and 'password-confirmation' in data:
             password = data.get("password")
             email = data.get("email")
@@ -264,8 +263,8 @@ def create_account(request):
         else:
             error = "empty_fields"
 
-
-    return render(request, 'user/create_account.html')
+    context = {"error":error}
+    return render(request, 'user/create_account.html',context)
 
 def login_user(request):
     error = False
@@ -291,3 +290,7 @@ def login_user(request):
 
     context = {"error":error}
     return render(request, 'user/login.html', context)
+
+def logout_user(request):
+    logout(request)
+    return redirect('login_user')

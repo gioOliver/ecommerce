@@ -5,6 +5,25 @@
 
 <h3>Crie sua conta</h3>
 
+{% if error == "empty_fields" %}
+    <p>Preencha todos os campos para criar a conta</p>
+{% endif %}
+
+
+{% if error == "invalid_email" %}
+    <p>Email inválido</p>
+{% endif %}
+
+
+{% if error == "user_exists" %}
+    <p>Esse email já foi cadastrado para outro usuário, tente fazer <a href="{% url 'login_user' %}">login</a></p>
+{% endif %}
+
+
+{% if error == "confirmation" %}
+    <p>Senha e confirmação não são iguais</p>
+{% endif %}
+
 <form method="post" action="{% url 'create_account' %}">
 {% csrf_token %}
     <input type="email" name="email" placeholder="Email"> <br>
