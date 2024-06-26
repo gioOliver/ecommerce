@@ -3,6 +3,7 @@ from .models import *
 import uuid
 from .helpers import filter_items, min_max_value, order_items
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
@@ -215,6 +216,7 @@ def add_address(request):
         context = {}
         return render(request, 'add_address.html', context)
 
+@login_required
 def my_account(request):
     return render(request, 'user/my_account.html')
 
@@ -291,6 +293,7 @@ def login_user(request):
     context = {"error":error}
     return render(request, 'user/login.html', context)
 
+@login_required
 def logout_user(request):
     logout(request)
     return redirect('login_user')
