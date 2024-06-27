@@ -220,6 +220,14 @@ def add_address(request):
 def my_account(request):
     return render(request, 'user/my_account.html')
 
+@login_required
+def my_orders(request):
+    client = request.user.client
+    orders = Order.objects.filter(finished=True, client=client).order_by("-finished_date")
+
+    context = {"orders":orders}
+    return render(request, 'user/my_orders.html', context)
+
 def create_account(request):
     if request.user.is_authenticated:
         return redirect('store')

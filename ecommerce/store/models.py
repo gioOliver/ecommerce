@@ -92,6 +92,12 @@ class Order(models.Model):
         items = ItemOrder.objects.filter(order__id=self.id)
         value = sum( [item.total_value for item in items] )
         return value
+    
+    @property
+    def items(self):
+        items = ItemOrder.objects.filter(order__id=self.id)
+        return items
+
 
 class ItemOrder(models.Model):
     item_stock  = models.ForeignKey(ItemStock, null=True, blank=True, on_delete=models.SET_NULL)
