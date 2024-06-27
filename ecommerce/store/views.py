@@ -218,7 +218,58 @@ def add_address(request):
 
 @login_required
 def my_account(request):
-    return render(request, 'user/my_account.html')
+    client = request.user.client
+    error = None
+    updated = False
+
+    if request.method == "POST":
+        data = request.POST.dict()
+        if "actual_password" in data:
+            actual_password = data.get("actual_password")
+            new_password = data.get("new_password")
+            confirmation_password = data.get("confirmation_password")
+
+            if new_password == confirmation_password:
+                user = authenticate(request, username=request.user.email, password=new_password)
+
+                if user:
+                    user.set_password(new_password)
+                    user.save()
+                    updated = True
+                else:
+                    error = "wrong_password"
+
+            else:
+                error = "confirmation"
+
+        elif "email" in data:
+            email = data.get("email")
+            name = data.get("name")
+            phone = data.get("phone")
+            
+            if email != request.user.email:
+                users = User.objects.filter(email=email)
+                if len(users) > 0 :
+                    error = "duplicated_email"
+                if not error:
+                    client = request.user.client
+                    client.email = email
+                    request.user.email = email
+                    request.user.username = email
+                    client.name = name
+                    client.phone = phone
+                    client.save()
+                    request.user.save()
+                    updated = True
+
+        else:
+            error = "invalid_form"
+
+    context = {
+        "error":error,
+        "updated":updated
+        }
+    return render(request, 'user/my_account.html', context)
 
 @login_required
 def my_orders(request):
