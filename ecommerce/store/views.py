@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from .models import *
 import uuid
 from .helpers import filter_items, min_max_value, order_items
@@ -6,6 +7,9 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from datetime import datetime
+from .api_mercadopago import payment
+
 
 # Create your views here.
 def homepage(request):
@@ -185,9 +189,90 @@ def checkout(request):
 
     context = {
         "order": order,
-        "addresses": addresses
+        "addresses": addresses,
+        "error":None
     }
     return render(request, 'checkout.html', context)
+
+def purchase(request, order_id):
+    error = None
+    print("############")
+    if request.method == 'POST':
+        data = request.POST.dict()
+        total = data.get("total")
+        total = float(total.replace(",","."))
+        order = Order.objects.get(id=order_id)
+        
+        if total != float(order.total_value):
+            error = "wrong_value"
+
+        if not "address" in data:
+            error = "empty_address"
+        else:
+            address_id = data.get("address")
+            order.address = Address.objects.get(id=address_id)
+    
+        if not request.user.is_authenticated:
+            email = data.get("email")
+            try:
+                validate_email(email)
+            except ValidationError:
+                error = "invalid_email"
+
+            if not error:
+                clients = Client.objects.filter(email=email)
+                if clients:
+                    order.client = clients[0]
+                    order.save()
+                else:
+                    order.client.email = email
+                    order.client.save()
+        
+        transaction_code = f"{order.id}-{datetime.now().timestamp()}"
+        order.transaction_code = transaction_code
+        order.save()
+        if error:
+            addresses = Address.objects.filter(client = order.client)
+            context = {
+                "error":error,
+                "order": order,
+                "addressess":addresses
+                }       
+            return render(request, "checkout.html", context)
+        else:
+            items = ItemOrder.objects.filter(order=order)
+            link = request.build_absolute_uri(reverse('close_payment'))
+            payment_link, payment_id = payment(items, link)
+            order_payment = Payment.objects.create(payment_id = payment_id, order=order)
+            order_payment.save()
+            return redirect(payment_link)
+    else:
+        return redirect("store")
+
+def close_payment(request):
+    data = request.GET.dict()
+    status = data.get("status")
+    preference_id = data.get("preference_id")
+
+    if status == "approved":
+        payment = Payment.objects.get(payment_id=preference_id)
+        payment.approved = True
+        order = payment.order
+        order.finished = True
+        order.finished_date = datetime.now()
+        order.save()
+        payment.save()
+        if request.user.is_authenticated:
+            redirect("orders")
+        else:
+            redirect("finished_order", order.id)
+    else:
+        return redirect("checkout")
+
+def finished_order(request, order_id):
+    order = Order.objects.get(id=order_id)
+    context = {"order": order}
+    return render(request, "finished_order.html", context)
 
 def add_address(request):
     if request.method == "POST":

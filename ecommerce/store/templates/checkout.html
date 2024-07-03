@@ -10,7 +10,19 @@
     <p>Total: {{order.total_value}}</p>
     <p>Amount: {{order.total_amount}}</p>
 
-    <form method="post" action="">
+    {% if error %}
+        {% if error == "wrong_value" %}
+            <p style="color:red" >Preço inválido dos valores</p>
+        {% endif %}
+        {% if error == "empty_address" %}
+            <p style="color:red" >Selecione um endereço de entrega!!!</p>
+        {% endif %}
+        {% if error == "invalid_email" %}
+            <p style="color:red" >Preencha o email</p>
+        {% endif %}
+    {% endif %}
+ 
+    <form method="post" action="{% url 'purchase' order.id %}">
         {% csrf_token %}
         <h3>Selecione o endereço de entrega</h3>
         <a href="{% url 'add_address' %}">Adicionar endereço de entrega </a>
